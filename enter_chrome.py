@@ -89,83 +89,90 @@ def check(text, browser):
         return True
     return False
     
-def click_select(id, pos, browser):
-    reqid = "document.getElementsByClassName('is-require')[" + id + "]"
+def click_select(rid, pos, browser):
+    reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click
     js = reqid + ".click();"
     print(js)
-    browser.executeScript(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # select pos
-    js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + pos + "].click();"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + str(pos) + "].click();"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # confirm
-    js = reqid + ".getElementsByClassName('mint-picker__confirm')[0].click();"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click();"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
+    print('finish select')
 
 
-def click_checkbox(id, browser):
-    reqid = "document.getElementsByClassName('is-require')[" + id + "]"
+def click_checkbox(rid, browser):
+    reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
+    # click
+    js = reqid + ".click();"
+    print(js)
+    browser.execute_script(js)
+    time.sleep(1)
 
     # click checkbox
     js = reqid + ".parentElement.getElementsByTagName('input')[1].click();"
-    browser.executeScript(js)
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-selected-footer-confirm')[0].click();"
-    browser.executeScript(js)
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
 
-def click_enter_date(id, dd, hh, mm, browser):
-    reqid = "document.getElementsByClassName('is-require')[" + id + "]"
+def click_enter_date(rid, dd, hh, mm, browser):
+    reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
 
     # click 
     js = reqid + ".click();"
     print(js)
-    browser.executeScript(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # set day
-    js = reqid + "parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + dd + "].click()"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(dd-1) + "].click()"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # set hour
-    js = reqid + "parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + hh + "].click()"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + str(hh) + "].click()"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # set minite
-    js = reqid + "parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + mm + "].click()"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + str(mm) + "].click();"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
     # confirm
-    js = reqid + ".getElementsByClassName('mint-picker__confirm')[0].click();"
-    browser.executeScript(js)
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click()"
     print(js)
+    browser.execute_script(js)
     time.sleep(1)
 
 
-def input_address(id, browser):
-    reqid = "document.getElementsByClassName('is-require')[" + id + "]"
+def input_address(rid, browser):
+    reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click 
-    js = reqid + ".getElementsByTagName('input')[0].innerText = '" + address + "';"
+
+    js = reqid + ".getElementsByTagName('input')[0].value = '" + address + "';"
     print(js)
-    browser.executeScript(js)
+    browser.execute_script(js)
     time.sleep(1)
 
 
@@ -204,16 +211,34 @@ if __name__ == "__main__":
                 time.sleep(sleep_time)
             elif dailyDone is False: # 今日未完成打卡
                 # 点击报平安
-                buttons = browser.find_element_by_class_name('mint-fixed-button')
+                buttons = browser.find_elements_by_class_name('mint-fixed-button')
+                print(len(buttons))
                 for button in buttons:
                     button.click()
                     browser.implicitly_wait(10)
                     print(browser.current_url)
 
-                    for i in range(5, 8):
-                        select(i, 0, browser)
+                    for i in range(5, 9):
+                        click_select(i, 0, browser)
                     
-                    # TODO 到校方式
+                    # 到校方式 (未标is_require 单独处理)
+                    # click
+                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
+                    print(js)
+                    browser.execute_script(js)
+                    time.sleep(1)
+
+                    # select
+                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
+                    print(js)
+                    browser.execute_script(js)
+                    time.sleep(1)
+
+                    # confirm
+                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
+                    print(js)
+                    browser.execute_script(js)
+                    time.sleep(1)
 
                     click_checkbox(10, browser)
 
@@ -223,15 +248,33 @@ if __name__ == "__main__":
                     click_enter_date(12, tomorrow, 21, 59, browser)
 
                     # TODO test input function
+                    # 似乎会报未填写的问题, 需要测试
                     input_address(13, browser)
 
-                    select(15, 2, browser)
+                    click_select(15, 2, browser)
+                    # 确认并提交
+                    buttons = browser.find_elements_by_tag_name('button')
+                    for button in buttons:
+                        print(button.get_attribute("textContent"))
+                        if button.get_attribute("textContent").find("提交") >= 0:
+                            button.click()
+                            buttons = browser.find_elements_by_tag_name('button')
+                            button = buttons[-1]
 
+                            # 提交
+                            if button.get_attribute("textContent").find("确定") >= 0:
+                                button.click()
+                                dailyDone = True # 标记已完成打卡
+                                writeLog("打卡成功")
+                            else:
+                                print("WARNING: 学校可能改版，请及时更新脚本")
+                            break
+                    break
 
             else:
                 browser.close()
                 print("------------------网站出现故障----------------------")
                 print("------------------浏览器已关闭----------------------")
-                time.sleep(1) # 昏睡5min 为了防止网络故障未打上卡
+                time.sleep(300) # 昏睡5min 为了防止网络故障未打上卡
         except Exception as r:
             print("未知错误 %s" %(r))
