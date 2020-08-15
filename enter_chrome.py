@@ -217,7 +217,6 @@ if __name__ == "__main__":
                     button.click()
                     browser.implicitly_wait(10)
                     print(browser.current_url)
-
                     for i in range(5, 9):
                         click_select(i, 0, browser)
                     
@@ -247,30 +246,39 @@ if __name__ == "__main__":
                     click_enter_date(11, tomorrow, 8, 31, browser)
                     click_enter_date(12, tomorrow, 21, 59, browser)
 
-                    # TODO test input function
-                    # 似乎会报未填写的问题, 需要测试
-                    input_address(13, browser)
-
                     click_select(15, 2, browser)
-                    # 确认并提交
-                    buttons = browser.find_elements_by_tag_name('button')
-                    for button in buttons:
-                        print(button.get_attribute("textContent"))
-                        if button.get_attribute("textContent").find("提交") >= 0:
-                            button.click()
+
+                    inputfileds = browser.find_elements_by_tag_name('input')
+                    for i in inputfileds:
+                        print(i.get_attribute('placeholder'))
+                        if i.get_attribute("placeholder").find("请输入所到楼宇（具体到门牌号）") >= 0:
+                            time.sleep(3)
+                            i.clear()
+                            i.send_keys(address)
+
+
+                            # 确认并提交
                             buttons = browser.find_elements_by_tag_name('button')
-                            button = buttons[-1]
+                            for button in buttons:
+                                print(button.get_attribute("textContent"))
+                                if button.get_attribute("textContent").find("提交") >= 0:
+                                    button.click()
+                                    buttons = browser.find_elements_by_tag_name('button')
+                                    button = buttons[-1]
 
-                            # 提交
-                            if button.get_attribute("textContent").find("确定") >= 0:
-                                button.click()
-                                dailyDone = True # 标记已完成打卡
-                                writeLog("打卡成功")
-                            else:
-                                print("WARNING: 学校可能改版，请及时更新脚本")
+                                    # 提交
+                                    if button.get_attribute("textContent").find("确定") >= 0:
+                                        button.click()
+                                        dailyDone = True # 标记已完成打卡
+                                        print("打卡成功")
+                                        writeLog("打卡成功")
+                                    else:
+                                        print("WARNING: 学校可能改版，请及时更新脚本")
+                                    break
                             break
-                    break
-
+                browser.quit()
+                print("------------------浏览器已关闭----------------------")
+                time.sleep(10) # 昏睡10s 为了防止网络故障未打上卡
             else:
                 browser.close()
                 print("------------------网站出现故障----------------------")
