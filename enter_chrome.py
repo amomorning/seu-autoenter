@@ -24,9 +24,7 @@ chrome_options.add_argument('log-level=3')
 chrome_options.add_argument('disable-infobars')
 chrome_options.add_argument('--headless')
 
-url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
 dailyDone = False # 今日是否已经打卡
-address = '前工院南602'
 
 # 创建打卡记录log文件
 def writeLog(text):
@@ -65,7 +63,7 @@ def enterUserPW():
     return user, pw, loc
 
 
-def login(user, pw, browser):
+def login(user, pw, url, browser):
     browser.get(url)
     browser.implicitly_wait(1)
     
@@ -84,9 +82,10 @@ def login(user, pw, browser):
 
 # 检查是否无text按钮
 def check(text, browser):
-    buttons = browser.find_elements_by_class_name(text)
-    if(len(buttons) > 0):
-        return True
+    buttons = browser.find_elements_by_tag_name('button')
+    for button in buttons:
+        if button.get_attribute("textContent").find(text)>= 0:
+            return True
     return False
     
 def click_select(rid, pos, browser):
@@ -165,15 +164,104 @@ def click_enter_date(rid, dd, hh, mm, browser):
     browser.execute_script(js)
     time.sleep(1)
 
-
-def input_address(rid, browser):
-    reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
-    # click 
-
-    js = reqid + ".getElementsByTagName('input')[0].value = '" + address + "';"
+def click_select_way(browser):
+    # 到校方式 (未标is_require 单独处理)
+    # click
+    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
     print(js)
     browser.execute_script(js)
     time.sleep(1)
+
+    # select
+    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
+    print(js)
+    browser.execute_script(js)
+    time.sleep(1)
+
+    # confirm
+    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
+    print(js)
+    browser.execute_script(js)
+    time.sleep(1)
+
+
+                
+def input_field(placehold, text, browser):
+    inputfileds = browser.find_elements_by_tag_name('input')
+    for i in inputfileds:
+        print(i.get_attribute('placeholder'))
+        if i.get_attribute("placeholder").find("请输入所到楼宇（具体到门牌号）") >= 0:
+            time.sleep(3)
+            i.clear()
+            i.send_keys(address)
+            break
+
+def click_confirm(text, log_text, browser):
+    buttons = browser.find_elements_by_tag_name('button')
+    for button in buttons:
+        print(button.get_attribute("textContent"))
+        if button.get_attribute("textContent").find(text) >= 0:
+            button.click()
+
+            buttons = browser.find_elements_by_tag_name('button')
+            button = buttons[-1]
+            # 提交
+            if button.get_attribute("textContent").find("确定") >= 0:
+                button.click()
+                dailyDone = True # 标记已完成打卡
+                print(log_text)
+                writeLog(log_text)
+            else:
+                print("WARNING: 学校可能改版，请及时更新脚本")
+
+            break
+
+def apply_enter():
+
+    enter_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
+    address = '前工院南602'
+
+    try:
+        browser = webdriver.Chrome('./chromedriver',options=chrome_options)
+        print("------------------浏览器已启动----------------------")
+        login(user, pw, enter_url, browser)
+        browser.implicitly_wait(1)
+        time.sleep(10)
+
+        buttons = browser.find_elements_by_class_name('mint-fixed-button')
+        print(len(buttons))
+        for button in buttons:
+            button.click()
+            browser.implicitly_wait(10)
+            break
+        print(browser.current_url)
+
+        for i in range(5, 9):
+            click_select(i, 0, browser)
+        
+        click_select_way(browser)
+
+        click_checkbox(10, browser)
+
+        tomorrow = (date.today() + timedelta(1)).day
+
+        click_enter_date(11, tomorrow, 8, 31, browser)
+        click_enter_date(12, tomorrow, 21, 59, browser)
+
+        click_select(15, 2, browser)
+
+        input_field("请输入所到楼宇（具体到门牌号）", address, browser)
+
+        # 确认并提交
+        click_confirm("提交", "申请成功", browser)
+
+
+        browser.quit()
+        print("------------------浏览器已关闭----------------------")
+        time.sleep(10) # 昏睡10s 为了防止网络故障未打上卡
+    except Exception as r:
+        print("未知错误 %s" %(r))
+
 
 
 if __name__ == "__main__":
@@ -193,15 +281,17 @@ if __name__ == "__main__":
     while True:
         try:
             # 登录打卡一次试一试
+            login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
             browser = webdriver.Chrome('./chromedriver',options=chrome_options)
             print("------------------浏览器已启动----------------------")
-            login(user, pw, browser)
-            browser.implicitly_wait(1)
+            login(user, pw, login_url, browser)
+            browser.implicitly_wait(10)
             time.sleep(10)
 
             # 确认是否打卡成功
             # 的确无新增按钮
-            dailyDone = not check("mint-fixed-button", browser)
+            dailyDone = not check("新增", browser)
+            print(dailyDone)
             print(browser.current_url)
             if dailyDone is True and check("退出", browser) is True: # 今日已完成打卡
                 sleep_time = (set_hour+24-time.localtime(time.time()).tm_hour)*3600 + (set_minite-time.localtime(time.time()).tm_min)*60
@@ -210,75 +300,20 @@ if __name__ == "__main__":
                 print("------------------浏览器已关闭----------------------")
                 time.sleep(sleep_time)
             elif dailyDone is False: # 今日未完成打卡
-                # 点击报平安
-                buttons = browser.find_elements_by_class_name('mint-fixed-button')
-                print(len(buttons))
+                buttons = browser.find_elements_by_css_selector('button')
                 for button in buttons:
-                    button.click()
-                    browser.implicitly_wait(10)
-                    print(browser.current_url)
-                    for i in range(5, 9):
-                        click_select(i, 0, browser)
-                    
-                    # 到校方式 (未标is_require 单独处理)
-                    # click
-                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
-                    print(js)
-                    browser.execute_script(js)
-                    time.sleep(1)
+                    if button.get_attribute("textContent").find("新增")>= 0:
+                        button.click()
+                        browser.implicitly_wait(10)
+                        break
+                
+                input_field("请输入当天晨检体温", str(random.randint(365,370)/10.0))
 
-                    # select
-                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
-                    print(js)
-                    browser.execute_script(js)
-                    time.sleep(1)
+                click_confirm("确认并提交", "打卡成功", browser) 
 
-                    # confirm
-                    js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
-                    print(js)
-                    browser.execute_script(js)
-                    time.sleep(1)
-
-                    click_checkbox(10, browser)
-
-                    tomorrow = (date.today() + timedelta(1)).day
-
-                    click_enter_date(11, tomorrow, 8, 31, browser)
-                    click_enter_date(12, tomorrow, 21, 59, browser)
-
-                    click_select(15, 2, browser)
-
-                    inputfileds = browser.find_elements_by_tag_name('input')
-                    for i in inputfileds:
-                        print(i.get_attribute('placeholder'))
-                        if i.get_attribute("placeholder").find("请输入所到楼宇（具体到门牌号）") >= 0:
-                            time.sleep(3)
-                            i.clear()
-                            i.send_keys(address)
-
-
-                            # 确认并提交
-                            buttons = browser.find_elements_by_tag_name('button')
-                            for button in buttons:
-                                print(button.get_attribute("textContent"))
-                                if button.get_attribute("textContent").find("提交") >= 0:
-                                    button.click()
-                                    buttons = browser.find_elements_by_tag_name('button')
-                                    button = buttons[-1]
-
-                                    # 提交
-                                    if button.get_attribute("textContent").find("确定") >= 0:
-                                        button.click()
-                                        dailyDone = True # 标记已完成打卡
-                                        print("打卡成功")
-                                        writeLog("打卡成功")
-                                    else:
-                                        print("WARNING: 学校可能改版，请及时更新脚本")
-                                    break
-                            break
                 browser.quit()
                 print("------------------浏览器已关闭----------------------")
-                time.sleep(10) # 昏睡10s 为了防止网络故障未打上卡
+                time.sleep(10) # 昏睡10s 为了防止网络故障未打上
             else:
                 browser.close()
                 print("------------------网站出现故障----------------------")
