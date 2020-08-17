@@ -75,7 +75,6 @@ def login(user, pw, url, browser):
     username.send_keys(user)
     password.send_keys(pw)
 
-
     # 点击登录
     login_button = browser.find_element_by_class_name('auth_login_btn')
     login_button.submit()
@@ -92,41 +91,41 @@ def click_select(rid, pos, browser):
     reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click
     js = reqid + ".click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # select pos
     js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + str(pos) + "].click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
-    print('finish select')
+    # print('finish select')
 
 
 def click_checkbox(rid, browser):
     reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click
     js = reqid + ".click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # click checkbox
     js = reqid + ".parentElement.getElementsByTagName('input')[1].click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-selected-footer-confirm')[0].click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
@@ -136,31 +135,31 @@ def click_enter_date(rid, dd, hh, mm, browser):
 
     # click 
     js = reqid + ".click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set day
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(dd-1) + "].click()"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set hour
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + str(hh) + "].click()"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set minite
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + str(mm) + "].click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click()"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
@@ -168,19 +167,19 @@ def click_select_way(browser):
     # 到校方式 (未标is_require 单独处理)
     # click
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # select
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
-    print(js)
+    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
@@ -189,32 +188,38 @@ def click_select_way(browser):
 def input_field(placehold, text, browser):
     inputfileds = browser.find_elements_by_tag_name('input')
     for i in inputfileds:
-        print(i.get_attribute('placeholder'))
-        if i.get_attribute("placeholder").find("请输入所到楼宇（具体到门牌号）") >= 0:
+        # print(i.get_attribute('placeholder'))
+        if i.get_attribute("placeholder").find(placehold) >= 0:
             time.sleep(3)
             i.clear()
-            i.send_keys(address)
+            i.send_keys(text)
             break
 
 def click_confirm(text, log_text, browser):
     buttons = browser.find_elements_by_tag_name('button')
     for button in buttons:
-        print(button.get_attribute("textContent"))
+        # print(button.get_attribute("textContent"))
         if button.get_attribute("textContent").find(text) >= 0:
+            # print(browser.current_url)
             button.click()
+            time.sleep(5)
+            # print(browser.current_url)
 
             buttons = browser.find_elements_by_tag_name('button')
             button = buttons[-1]
+            # print(button.get_attribute("textContent"))
             # 提交
             if button.get_attribute("textContent").find("确定") >= 0:
                 button.click()
                 dailyDone = True # 标记已完成打卡
                 print(log_text)
                 writeLog(log_text)
+                return True
             else:
                 print("WARNING: 学校可能改版，请及时更新脚本")
 
             break
+    return False
 
 def apply_enter():
 
@@ -229,12 +234,12 @@ def apply_enter():
         time.sleep(10)
 
         buttons = browser.find_elements_by_class_name('mint-fixed-button')
-        print(len(buttons))
+        # print(len(buttons))
         for button in buttons:
             button.click()
             browser.implicitly_wait(10)
             break
-        print(browser.current_url)
+        # print(browser.current_url)
 
         for i in range(5, 9):
             click_select(i, 0, browser)
@@ -282,6 +287,7 @@ if __name__ == "__main__":
         try:
             # 登录打卡一次试一试
             login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
+
             browser = webdriver.Chrome('./chromedriver',options=chrome_options)
             print("------------------浏览器已启动----------------------")
             login(user, pw, login_url, browser)
@@ -307,13 +313,20 @@ if __name__ == "__main__":
                         browser.implicitly_wait(10)
                         break
                 
-                input_field("请输入当天晨检体温", str(random.randint(365,370)/10.0))
+                input_field("请输入当天晨检体温", str(random.randint(365,370)/10.0), browser)
 
-                click_confirm("确认并提交", "打卡成功", browser) 
+                if(click_confirm("确认并提交", "打卡成功", browser)) : 
+                    browser.quit()
+                    print("------------------浏览器已关闭----------------------")
+                    time.sleep(10) # 昏睡10s 为了防止网络故障未打上
 
-                browser.quit()
-                print("------------------浏览器已关闭----------------------")
-                time.sleep(10) # 昏睡10s 为了防止网络故障未打上
+                    apply_enter()
+
+
+                else:
+                    browser.close()
+                    print("------------------打卡出现故障----------------------")
+                    print("------------------浏览器已关闭----------------------")
             else:
                 browser.close()
                 print("------------------网站出现故障----------------------")
