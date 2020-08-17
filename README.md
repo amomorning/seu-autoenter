@@ -6,23 +6,35 @@
 
 登录程序主体来自 [StephenHoo/AutoLogin](https://github.com/StephenHoo/AutoLogin)
 
+## Usage
+在[Releases](https://github.com/amomorning/seu-autoenter/releases)中发布了无需配置环境的程序包
+### Download
+- 每日报平安只需下载 login_chrome.zip 
+- 自动每日报平安并申请入校(次日 8:31-21:59 四牌楼校区) 下载 enter_chrome.zip
+### Run
+- 注意需要 chrome 更新到 83 以上 (settings - about - check update)
+- 初次运行需要双击 login_chrome.exe 或 enter_chrome.exe 输入一卡通号及密码, 之后会自动读取保存的文件
+- 后续将 login.vbs 或 enter.vbs 创建快捷方式添加到开机启动项, 重启电脑自动无窗口执行打卡程序
+- 可以给电脑设定自动开机, 那么不管晚上是否关机第二天都能打上卡
+
 ## Requirements
+自行编译运行需要以下环境
 - python3
 - selenium
 - chrome (测试过程使用的版本号为 84.0.4147.125 (Official Build) (64-bit))
 
-## Usage
+## Compile
 ``` bash
 conda create -n selenium
 conda activate selenium
 conda install -c conda-forge selenium
 
 # 每日打卡
-start /b python login_chrome.py
+python login_chrome.py
 [输入用户名密码]
 
 # 申请入校
-start /b python enter_chrome.py
+python enter_chrome.py
 ```
 
 ## FAQ
