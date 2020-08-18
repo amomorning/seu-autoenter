@@ -131,3 +131,5 @@ dmypy.json
 
 # other
 loginData.txt
+test*
+_*

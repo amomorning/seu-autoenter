@@ -23,7 +23,6 @@
 - selenium
 - chrome (测试过程使用的版本号为 84.0.4147.125 (Official Build) (64-bit))
 
-## Compile
 ``` bash
 conda create -n selenium
 conda activate selenium
