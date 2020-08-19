@@ -76,19 +76,19 @@ def click_select(rid, pos, browser):
     js = reqid + ".click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # select pos
     js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + str(pos) + "].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
     # print('finish select')
 
 
@@ -98,19 +98,19 @@ def click_checkbox(rid, browser):
     js = reqid + ".click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # click checkbox
     js = reqid + ".parentElement.getElementsByTagName('input')[1].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-selected-footer-confirm')[0].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
 
 def click_enter_date(rid, dd, hh, mm, browser):
@@ -120,31 +120,31 @@ def click_enter_date(rid, dd, hh, mm, browser):
     js = reqid + ".click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # set day
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(dd-1) + "].click()"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # set hour
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + str(hh) + "].click()"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # set minite
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + str(mm) + "].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click()"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
 def click_select_way(browser):
     # 到校方式 (未标is_require 单独处理)
@@ -152,19 +152,19 @@ def click_select_way(browser):
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # select
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
     # confirm
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(3)
 
 # TODO 没有找到上传图片的标签
 # def upload_health_code(browser):
@@ -219,10 +219,8 @@ def click_confirm(text, log_text, browser):
     return False
 
 def apply_enter(user, pw, address):
-
-    enter_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
-
     try:
+        enter_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
         browser = webdriver.Chrome('./chromedriver',options=chrome_options)
         print("------------------浏览器已启动----------------------")
         login(user, pw, enter_url, browser)
@@ -252,17 +250,79 @@ def apply_enter(user, pw, address):
         click_select(15, 2, browser)
 
         input_field("请输入所到楼宇（具体到门牌号）", address, browser)
+        browser.implicitly_wait(10)
 
         # 确认并提交
-        click_confirm("提交", "申请成功", browser)
+        if(click_confirm("提交", "申请成功", browser)) : 
+            browser.quit()
+            print("------------------浏览器已关闭----------------------")
+            time.sleep(10) # 昏睡10s 为了防止网络故障未打上
+            return True
+        else:
+            browser.close()
+            print("------------------打卡出现故障----------------------")
+            print("------------------浏览器已关闭----------------------")
 
-
-        browser.quit()
-        print("------------------浏览器已关闭----------------------")
-        time.sleep(10) # 昏睡10s 为了防止网络故障未打上卡
     except Exception as r:
         print("未知错误 %s" %(r))
 
+    return False
+
+
+def auto_login(user, pw, address):
+    try:
+        # 登录打卡一次试一试
+        login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
+
+        browser = webdriver.Chrome('./chromedriver',options=chrome_options)
+        print("------------------浏览器已启动----------------------")
+        login(user, pw, login_url, browser)
+        browser.implicitly_wait(10)
+        time.sleep(10)
+
+        # 确认是否打卡成功
+        # 的确无新增按钮
+        dailyDone = not check("新增", browser)
+        # print(dailyDone)
+        print(browser.current_url)
+        if dailyDone is True and check("退出", browser) is True: # 今日已完成打卡
+            sleep_time = (set_hour+24-time.localtime(time.time()).tm_hour)*3600 + (set_minite-time.localtime(time.time()).tm_min)*60
+            writeLog("下次打卡时间：明天" + str(set_hour) + ':' + str(set_minite) + "，" + "即" + str(sleep_time) + 's后')
+            browser.quit()
+            print("------------------浏览器已关闭----------------------")
+            time.sleep(sleep_time)
+        elif dailyDone is False: # 今日未完成打卡
+            buttons = browser.find_elements_by_css_selector('button')
+            for button in buttons:
+                if button.get_attribute("textContent").find("新增")>= 0:
+                    button.click()
+                    browser.implicitly_wait(10)
+                    break
+            
+            input_field("请输入当天晨检体温", str(random.randint(360,367)/10.0), browser)
+            browser.implicitly_wait(10)
+
+            if(click_confirm("确认并提交", "打卡成功", browser)) : 
+                browser.quit()
+                print("------------------浏览器已关闭----------------------")
+                time.sleep(10) # 昏睡10s 为了防止网络故障未打上
+
+                while True:
+                    if(apply_enter(user, pw, address)):
+                        break
+
+            else:
+                browser.close()
+                print("------------------打卡出现故障----------------------")
+                print("------------------浏览器已关闭----------------------")
+        else:
+            browser.close()
+            print("------------------网站出现故障----------------------")
+            print("------------------浏览器已关闭----------------------")
+            time.sleep(300) # 昏睡5min 为了防止网络故障未打上卡
+    except Exception as r:
+        print("未知错误 %s" %(r))
+    
 
 def checkPW(user, pw, address):
     if(user == ""):
@@ -272,6 +332,7 @@ def checkPW(user, pw, address):
     if(address == ""):
         return False
     return True
+
 
 if __name__ == "__main__":
     user, pw, address = readConfig()
@@ -289,53 +350,6 @@ if __name__ == "__main__":
 
 
         while True:
-            try:
-                # 登录打卡一次试一试
-                login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
+            auto_login(user, pw, address)
+            
 
-                browser = webdriver.Chrome('./chromedriver',options=chrome_options)
-                print("------------------浏览器已启动----------------------")
-                login(user, pw, login_url, browser)
-                browser.implicitly_wait(10)
-                time.sleep(10)
-
-                # 确认是否打卡成功
-                # 的确无新增按钮
-                dailyDone = not check("新增", browser)
-                # print(dailyDone)
-                print(browser.current_url)
-                if dailyDone is True and check("退出", browser) is True: # 今日已完成打卡
-                    sleep_time = (set_hour+24-time.localtime(time.time()).tm_hour)*3600 + (set_minite-time.localtime(time.time()).tm_min)*60
-                    writeLog("下次打卡时间：明天" + str(set_hour) + ':' + str(set_minite) + "，" + "即" + str(sleep_time) + 's后')
-                    browser.quit()
-                    print("------------------浏览器已关闭----------------------")
-                    time.sleep(sleep_time)
-                elif dailyDone is False: # 今日未完成打卡
-                    buttons = browser.find_elements_by_css_selector('button')
-                    for button in buttons:
-                        if button.get_attribute("textContent").find("新增")>= 0:
-                            button.click()
-                            browser.implicitly_wait(10)
-                            break
-                    
-                    input_field("请输入当天晨检体温", str(random.randint(360,367)/10.0), browser)
-
-                    if(click_confirm("确认并提交", "打卡成功", browser)) : 
-                        browser.quit()
-                        print("------------------浏览器已关闭----------------------")
-                        time.sleep(10) # 昏睡10s 为了防止网络故障未打上
-
-                        apply_enter(user, pw, address)
-
-
-                    else:
-                        browser.close()
-                        print("------------------打卡出现故障----------------------")
-                        print("------------------浏览器已关闭----------------------")
-                else:
-                    browser.close()
-                    print("------------------网站出现故障----------------------")
-                    print("------------------浏览器已关闭----------------------")
-                    time.sleep(300) # 昏睡5min 为了防止网络故障未打上卡
-            except Exception as r:
-                print("未知错误 %s" %(r))
