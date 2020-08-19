@@ -47,7 +47,6 @@ conda install -c conda-forge selenium
 
 # 每日打卡
 python login_chrome.py
-[输入用户名密码]
 
 # 申请入校
 python enter_chrome.py
