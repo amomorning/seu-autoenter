@@ -40,10 +40,11 @@ def readConfig():
         enter_dict = json.load(load_f)
         user = enter_dict["username"]
         pw = enter_dict["password"]
+        tel = enter_dict["tel"]
         address = enter_dict["address"]
     # print(enter_dict)
 
-    return user, pw, address
+    return user, pw, tel, address
 
 
 def login(user, pw, url, browser):
@@ -74,43 +75,43 @@ def click_select(rid, pos, browser):
     reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click
     js = reqid + ".click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # select pos
     js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + str(pos) + "].click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
-    # print('finish select')
+    time.sleep(1)
+    print('finish select')
 
 
 def click_checkbox(rid, browser):
     reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
     # click
     js = reqid + ".click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # click checkbox
     js = reqid + ".parentElement.getElementsByTagName('input')[1].click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-selected-footer-confirm')[0].click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
 
 def click_enter_date(rid, dd, hh, mm, browser):
@@ -118,53 +119,53 @@ def click_enter_date(rid, dd, hh, mm, browser):
 
     # click 
     js = reqid + ".click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # set day
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(dd-1) + "].click()"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # set hour
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + str(hh) + "].click()"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # set minite
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + str(mm) + "].click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click()"
     print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
 def click_select_way(browser):
     # 到校方式 (未标is_require 单独处理)
     # click
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > a').click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # select
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(2) > div > ul > li:nth-child(2)').click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
     # confirm
     js = "document.querySelector('#app > div > div > div:nth-child(3) > div > div:nth-child(2) > div:nth-child(8) > div > div > div > div:nth-child(1) > div:nth-child(2)').click();"
-    # print(js)
+    print(js)
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(1)
 
 # TODO 没有找到上传图片的标签
 # def upload_health_code(browser):
@@ -218,7 +219,7 @@ def click_confirm(text, log_text, browser):
             break
     return False
 
-def apply_enter(user, pw, address):
+def apply_enter(user, pw, tel, address):
     try:
         enter_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
         browser = webdriver.Chrome('./chromedriver',options=chrome_options)
@@ -252,6 +253,10 @@ def apply_enter(user, pw, address):
         input_field("请输入所到楼宇（具体到门牌号）", address, browser)
         browser.implicitly_wait(10)
 
+        input_field("请输入联系方式", tel, browser)
+        browser.implicitly_wait(10)
+
+
         # 确认并提交
         if(click_confirm("提交", "申请成功", browser)) : 
             browser.quit()
@@ -269,7 +274,7 @@ def apply_enter(user, pw, address):
     return False
 
 
-def auto_login(user, pw, address):
+def auto_login(user, pw, tel, address):
     try:
         # 登录打卡一次试一试
         login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
@@ -308,7 +313,7 @@ def auto_login(user, pw, address):
                 time.sleep(10) # 昏睡10s 为了防止网络故障未打上
 
                 while True:
-                    if(apply_enter(user, pw, address)):
+                    if(apply_enter(user, pw, tel, address)):
                         break
 
             else:
@@ -324,20 +329,26 @@ def auto_login(user, pw, address):
         print("未知错误 %s" %(r))
     
 
-def checkPW(user, pw, address):
+def checkPW(user, pw, tel, address):
     if(user == ""):
         return False
     if(pw == ""):
         return False
     if(address == ""):
         return False
+    if(tel == ""):
+        return False
     return True
 
 
 if __name__ == "__main__":
-    user, pw, address = readConfig()
-    
-    if(not checkPW(user, pw, address)):
+    user, pw, tel, address = readConfig()
+    # Test apply
+    # while True:
+    #     if(apply_enter(user, pw, address)):
+    #         break 
+
+    if(not checkPW(user, pw, tel, address)):
         print("Input is not valid, please check file './_enter.json' ")
     else:
         localtime = time.localtime(time.time())
@@ -350,6 +361,6 @@ if __name__ == "__main__":
 
 
         while True:
-            auto_login(user, pw, address)
+            auto_login(user, pw, tel, address)
             
 
