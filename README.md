@@ -9,8 +9,9 @@
 ## Usage
 在[Releases](https://github.com/amomorning/seu-autoenter/releases)中发布了无需配置环境的程序包
 ### Download
-- 每日报平安只需下载 [login_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.0/login_chrome.zip) 
-- 自动每日报平安并申请入校(次日 8:31-21:59 四牌楼校区) 下载 [enter_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.0/enter_chrome.zip)
+- 每日报平安只需下载 [login_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/login_chrome.zip) 
+- 自动每日报平安并申请入校(次日 8:31-21:59 四牌楼校区) 下载 [enter_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome.zip)
+- 新增的 [enter_chrome_tel.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome_tel.zip) 应对部分同学需要手动填联系方式的情况
 - 注意需要 chrome 更新到 83 以上 (settings - about - check update)
 
 ### 每日打卡
@@ -55,3 +56,5 @@ python enter_chrome.py
 ## FAQ
 #### Q: 为什么需要这个程序?
 A: 经常在中午12点超出一丢丢的时候意识到妹油申请入校 TAT 原先可以手动调本地时间避开申请时间限制，但是似乎在某此更新里学校修复了这个bug....
+#### Q: 如果学校申请入校填写内容有更新怎么办?
+A: 会无法成功打卡或申请入校，你可以自己编译这个 repo 的代码或者联系 amomorning@gmail.com 修改。
