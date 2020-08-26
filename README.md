@@ -12,7 +12,7 @@
 - 每日报平安只需下载 [login_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/login_chrome.zip) 
 - 自动每日报平安并申请入校(次日 8:31-21:59 四牌楼校区) 下载 [enter_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome.zip)
 - 新增的 [enter_chrome_tel.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome_tel.zip) 应对部分同学需要手动填联系方式的情况
-### 下载 Chrome 对应版本的 Driver
+#### 下载 Chrome 对应版本的 Driver
 - 首先要更新 Chrome 版本 (settings - about - check update)
 - 在 [ChromeDriver](httpsChromeDriverver.chromium.org/downloads) 网页上下载对应版本的驱动
 - 解压的exe文件替换 `bin` 文件夹中的 `chromedriver.exe`
