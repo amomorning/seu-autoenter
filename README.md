@@ -9,39 +9,24 @@
 ## Usage
 在[Releases](https://github.com/amomorning/seu-autoenter/releases)中发布了无需配置环境的程序包
 ### Download
-- 每日报平安只需下载 [login_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/login_chrome.zip) 
-- 自动每日报平安并申请入校(次日 8:31-21:59 四牌楼校区) 下载 [enter_chrome.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome.zip)
-- 新增的 [enter_chrome_tel.zip](https://github.com/amomorning/seu-autoenter/releases/download/v1.1/enter_chrome_tel.zip) 应对部分同学需要手动填联系方式的情况
-#### 下载 Chrome 对应版本的 Driver
-- 首先要更新 Chrome 版本 (settings - about - check update)
-- 在 [ChromeDriver](httpsChromeDriverver.chromium.org/downloads) 网页上下载对应版本的驱动
-- 解压的exe文件替换 `bin` 文件夹中的 `chromedriver.exe`
+- 每日报平安和申请入校整合在一个文件 AutoEnter.zip 中，可从最外层的README.md文件查看操作说明
 
-### 每日打卡
-- login_chrome.zip 对应源码 login_chrome.py
-- 该程序随机填入36.0-36.7体温并提交打卡记录
-#### 使用步骤
-1. 在`_login.json`中填入一卡通号、密码
-2. 双击`login.vbs`, 约一分钟内能完成打卡, 如不关机下次打卡时间为`hh>10?7:hh`时`mm`分.
-3. 将`login.vbs`快捷方式复制到开机启动项中, 那么开机自动打卡(不能使用Windows睡眠)
-4. 日志文件为`./bin/log.txt`
+### AutoEnter
+1. 确认Chrome已升级到最新，否则应下载对应版本的 [ChromeDriver](https://chromedriver.chromium.org/downloads) 并替换 
+2. 在`config.json`中填入一卡通号(username)、密码(password)，是否申请入校(enter)填`true`或`false`
+3. 每日申请入校所填资料中所到的地址(address)为必填项，手机号码(tel)为可选项，如果你平时就无需填写直接留空即可。
+4. 第一次使用双击`AutoEnter.exe`以便确认是否能成功打卡，网络正常情况下，约30秒出现**打卡成功**，约2分钟出现**申请成功**
+5. 双击`AutoEnter.vbs`可无窗口自动运行，从任务管理器可以看到`AutoEnter.exe`在后台运行, 如不关机下次打卡时间为`hh>10?7:hh`时`mm`分.
+6. `AutoEnter.vbs`创建快捷方式并复制到开机启动项中, 那么开机自动打卡(不能使用Windows睡眠)
+7. 第一次成功打卡后产生日志文件`log.txt`
 
-
-### 申请入校
-- enter_chrome.zip 对应源码 enter_chrome.py
-- 该程序随机填入36.0-36.7体温并提交打卡记录, 再执行自动填表申请入校, 到校后所到地址需在`_enter.json`中写明
-#### 使用步骤
-1. 在`_enter.json`中填入一卡通号、密码，以及每日申请入校所到的地址
-2. 双击`enter.vbs`, 约两分钟内能完成打卡和申请, 如不关机下次打卡时间为`hh>10?7:hh`时`mm`分.
-3. 将`enter.vbs`快捷方式复制到开机启动项中, 那么开机自动打卡(不能使用Windows睡眠)
-4. 日志文件为`./bin/log.txt`
 
 
 ## Requirements
 自行编译运行需要以下环境
 - python3
 - selenium
-- chrome (测试过程使用的版本号为 84.0.4147.125 (Official Build) (64-bit))
+- chrome (Version 85.0.4183.83)
 - pyinstaller (用于导出exe)
 
 ``` bash
@@ -54,6 +39,9 @@ python login_chrome.py
 
 # 申请入校
 python enter_chrome.py
+
+# 每日打卡并申请入校
+python AutoEnter.py
 ```
 
 ## FAQ
@@ -61,3 +49,5 @@ python enter_chrome.py
 A: 经常在中午12点超出一丢丢的时候意识到妹油申请入校 TAT 原先可以手动调本地时间避开申请时间限制，但是似乎在某此更新里学校修复了这个bug....
 #### Q: 如果学校申请入校填写内容有更新怎么办?
 A: 会无法成功打卡或申请入校，你可以自己编译这个 repo 的代码或者联系 amomorning@gmail.com 修改。
+#### Q: 程序如何确定申请入校的时间段? 
+A: 在四牌楼入校可申请的最大时间段为8:31 - 21:59，程序中固定使用了这一时间。根据学校规定，申请成功的时间段内才能刷卡进出学校、宿舍、图书馆等地。
