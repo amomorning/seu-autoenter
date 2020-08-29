@@ -40,11 +40,10 @@ def readConfig():
         enter_dict = json.load(load_f)
         user = enter_dict["username"]
         pw = enter_dict["password"]
-        tel = enter_dict["tel"]
         address = enter_dict["address"]
     # print(enter_dict)
 
-    return user, pw, tel, address
+    return user, pw, address
 
 
 def login(user, pw, url, browser):
@@ -219,7 +218,7 @@ def click_confirm(text, log_text, browser):
             break
     return False
 
-def apply_enter(user, pw, tel, address):
+def apply_enter(user, pw, address):
     try:
         enter_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp3/sys/lwWiseduElectronicPass/*default/index.do"
         browser = webdriver.Chrome('./chromedriver',options=chrome_options)
@@ -232,9 +231,11 @@ def apply_enter(user, pw, tel, address):
         # print(len(buttons))
         for button in buttons:
             button.click()
-            browser.implicitly_wait(10)
             break
         # print(browser.current_url)
+
+        browser.implicitly_wait(1)
+        time.sleep(10)
 
         for i in range(5, 9):
             click_select(i, 0, browser)
@@ -253,10 +254,6 @@ def apply_enter(user, pw, tel, address):
         input_field("请输入所到楼宇（具体到门牌号）", address, browser)
         browser.implicitly_wait(10)
 
-        input_field("请输入联系方式", tel, browser)
-        browser.implicitly_wait(10)
-
-
         # 确认并提交
         if(click_confirm("提交", "申请成功", browser)) : 
             browser.quit()
@@ -274,7 +271,7 @@ def apply_enter(user, pw, tel, address):
     return False
 
 
-def auto_login(user, pw, tel, address):
+def auto_login(user, pw, address):
     try:
         # 登录打卡一次试一试
         login_url = "https://newids.seu.edu.cn/authserver/login?service=http://ehall.seu.edu.cn/qljfwapp2/sys/lwReportEpidemicSeu/*default/index.do"
@@ -313,7 +310,7 @@ def auto_login(user, pw, tel, address):
                 time.sleep(10) # 昏睡10s 为了防止网络故障未打上
 
                 while True:
-                    if(apply_enter(user, pw, tel, address)):
+                    if(apply_enter(user, pw, address)):
                         break
 
             else:
@@ -329,26 +326,24 @@ def auto_login(user, pw, tel, address):
         print("未知错误 %s" %(r))
     
 
-def checkPW(user, pw, tel, address):
+def checkPW(user, pw, address):
     if(user == ""):
         return False
     if(pw == ""):
         return False
     if(address == ""):
         return False
-    if(tel == ""):
-        return False
     return True
 
 
 if __name__ == "__main__":
-    user, pw, tel, address = readConfig()
+    user, pw, address = readConfig()
     # Test apply
     # while True:
     #     if(apply_enter(user, pw, address)):
     #         break 
 
-    if(not checkPW(user, pw, tel, address)):
+    if(not checkPW(user, pw, address)):
         print("Input is not valid, please check file './_enter.json' ")
     else:
         localtime = time.localtime(time.time())
@@ -361,6 +356,6 @@ if __name__ == "__main__":
 
 
         while True:
-            auto_login(user, pw, tel, address)
+            auto_login(user, pw, address)
             
 
