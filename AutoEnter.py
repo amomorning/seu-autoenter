@@ -44,8 +44,11 @@ def readConfig():
         pw = enter_dict["password"]
         tel = enter_dict["tel"]
         address = enter_dict["address"]
+
+        global enterFlag
         enterFlag = enter_dict["enter"]
-    print(enter_dict)
+    
+    # print(enter_dict)
 
     return user, pw, tel, address
 
@@ -351,6 +354,7 @@ if __name__ == "__main__":
         set_minite = localtime.tm_min # 首次登陆的分钟时刻，代表以后每次在此分钟时刻打卡
         set_hour = localtime.tm_hour # 首次登陆的时钟时刻，代表以后每次在此时钟时刻打卡
 
+        print(enterFlag)
         if set_hour > 9:
             set_hour = 7 # 如果首次登录超过上午10点，则以后默认在7点钟打卡
             first_time = True
