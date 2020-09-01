@@ -120,7 +120,7 @@ def click_checkbox(rid, browser):
     time.sleep(1)
 
 
-def click_enter_date(rid, dd, hh, mm, browser):
+def click_enter_date(rid, tomorrow, hh, mm, browser):
     reqid = "document.getElementsByClassName('is-require')[" + str(rid) + "]"
 
     # click 
@@ -128,9 +128,16 @@ def click_enter_date(rid, dd, hh, mm, browser):
     print(js)
     browser.execute_script(js)
     time.sleep(1)
+    
+    # set month
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[1].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.month-1) + "].click()"
+    print(js)
+    browser.execute_script(js)
+    time.sleep(1)
+
 
     # set day
-    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(dd-1) + "].click()"
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.day-1) + "].click()"
     print(js)
     browser.execute_script(js)
     time.sleep(1)
@@ -251,7 +258,7 @@ def apply_enter(user, pw, tel, address):
 
         click_checkbox(10, browser)
 
-        tomorrow = (date.today() + timedelta(1)).day
+        tomorrow = (date.today() + timedelta(1))
 
         click_enter_date(11, tomorrow, 8, 31, browser)
         click_enter_date(12, tomorrow, 21, 59, browser)
