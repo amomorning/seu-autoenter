@@ -133,3 +133,4 @@ dmypy.json
 loginData.txt
 test*
 _*
+config.json
