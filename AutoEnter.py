@@ -130,7 +130,7 @@ def click_enter_date(rid, tomorrow, hh, mm, browser):
     time.sleep(1)
 
     # set year
-    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[1].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1920) + "].click()"
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1920) + "].click()"
     print(js)
     browser.execute_script(js)
     time.sleep(1)
