@@ -1,6 +1,8 @@
 # SEU AutoEnter
 
 [![license](https://img.shields.io/github/license/amomorning/seu-autoenter)](https://github.com/amomorning/seu-autoenter/blob/master/LICENSE)
+[![Release Version](https://img.shields.io/github/release/amomorning/seu-autoenter)](https://github.com/amomorning/seu-autoenter/releases)
+
 
 东南大学每日报平安健康打卡及入校申请自动化程序  
 
