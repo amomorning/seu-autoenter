@@ -11,6 +11,7 @@ from datetime import date, timedelta
 import time
 import random
 import json
+import codecs
 
 
 # 加启动配置 禁用日志log
@@ -38,7 +39,7 @@ def writeLog(text):
         f.close()
 
 def readConfig():
-    with open("./config.json",'r', encoding="utf-8") as load_f:
+    with codecs.open('./config.json','r', encoding='utf-8', errors='ignore') as load_f:
         enter_dict = json.load(load_f)
         user = enter_dict["username"]
         pw = enter_dict["password"]
@@ -256,6 +257,8 @@ def apply_enter(user, pw, tel, address):
 
         browser.implicitly_wait(1)
         time.sleep(10)
+
+        click_select(2, 0, browser)
 
         for i in range(5, 9):
             click_select(i, 0, browser)

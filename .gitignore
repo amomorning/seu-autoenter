@@ -10,7 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+dist*
 downloads/
 eggs/
 .eggs/
@@ -134,3 +134,4 @@ loginData.txt
 test*
 _*
 config.json
+log.txt
