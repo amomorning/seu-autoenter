@@ -8,6 +8,13 @@
 
 登录程序主体来自 [StephenHoo/AutoLogin](https://github.com/StephenHoo/AutoLogin)
 
+## News
+根据学校通知：
+> 四牌楼校内住宿生、南京校区校外住宿学生完成每日打卡并符合入校条件者，次日测温刷卡入校，无需进行入校申请和审核。 
+>
+所以这个项目暂时告别啦（鼓掌  
+当然自动打卡还可以继续使用，只要在**是否申请入校(enter)**填`false`即可。
+
 ## Usage
 在[Releases](https://github.com/amomorning/seu-autoenter/releases)中发布了无需配置环境的程序包
 ### Download
