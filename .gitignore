@@ -135,3 +135,5 @@ test*
 _*
 config.json
 log.txt
+*.exe
+*.zip

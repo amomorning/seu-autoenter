@@ -12,7 +12,6 @@ import time
 import random
 import json
 import codecs
-import re
 
 
 # 加启动配置 禁用日志log
@@ -29,6 +28,57 @@ chrome_options.add_argument('--headless')
 
 dailyDone = False # 今日是否已经打卡
 enterFlag = False # 是否需要申请入校
+
+# 下载最新版本 chromedriver
+# https://blog.csdn.net/weijiaxin2010/article/details/86651042
+import requests
+import os
+import zipfile
+import re
+
+def get_latest_version(url):
+    '''查询最新的Chromedriver版本'''
+    rep = requests.get(url).text
+    time_list = []                                          # 用来存放版本时间
+    time_version_dict = {}                                  # 用来存放版本与时间对应关系
+    result = re.compile(r'\d.*?/</a>.*?Z').findall(rep)     # 匹配文件夹（版本号）和时间
+    for i in result:
+        time = i[-24:-1]                                    # 提取时间
+        version = re.compile(r'.*?/').findall(i)[0]         # 提取版本号
+        time_version_dict[time] = version                   # 构建时间和版本号的对应关系，形成字典
+        time_list.append(time)                              # 形成时间列表
+    
+    mmax = time_list[0]
+    nmax = time_list[0]
+    for it in time_list:
+        if(it > mmax):
+            nmax = mmax
+            mmax = it
+    latest_version = time_version_dict[nmax][:-1] # 用最大（新）时间去字典中获取最新的版本号
+    return latest_version
+
+def download_driver(download_url):
+    '''下载文件'''
+    file = requests.get(download_url)
+    with open("chromedriver.zip", 'wb') as zip_file:        # 保存文件到脚本所在目录
+        zip_file.write(file.content)
+        print('下载成功')
+
+def get_version():
+    '''查询系统内的Chromedriver版本'''
+    outstd2 = os.popen('chromedriver --version').read()
+    return outstd2.split(' ')[1]
+
+def get_path():
+    '''查询系统内Chromedriver的存放路径'''
+    outstd1 = os.popen('where chromedriver').read()
+    return outstd1.strip('chromedriver.exe\n')
+
+def unzip_driver(path):
+    '''解压Chromedriver压缩包到指定目录'''
+    f = zipfile.ZipFile("chromedriver.zip",'r')
+    for file in f.namelist():
+        f.extract(file, path)
 
 
 # 创建打卡记录log文件
@@ -380,6 +430,22 @@ if __name__ == "__main__":
             set_hour = 7 # 如果首次登录超过上午10点，则以后默认在7点钟打卡
 
         while True:
+            url = 'http://npm.taobao.org/mirrors/chromedriver/'
+            latest_version = get_latest_version(url)
+            print('最新的chromedriver版本为：', latest_version)
+            version = get_version()
+            print('当前系统内的Chromedriver版本为：', version)
+            if version == latest_version:
+                print('当前系统内的Chromedriver已经是最新的')
+            else:
+                print('当前系统内的Chromedriver不是最新的，需要进行更新')
+                download_url = url + latest_version + '/chromedriver_win32.zip'  # 拼接下载链接
+                download_driver(download_url)
+                path = get_path()
+                print('替换路径为：', path)
+                unzip_driver(path)
+                print('更新后的Chromedriver版本为：', get_version())        
+
             while(True):
                 if(auto_login(user, pw, tel, address)):
                     break
