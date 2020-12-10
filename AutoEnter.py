@@ -35,8 +35,13 @@ import requests
 import os
 import zipfile
 import re
+import winreg
 
-def get_latest_version(url):
+def get_chrome_version():
+    FullChromeVersion = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,'SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome'),'DisplayVersion')[0]
+    return int(FullChromeVersion.split('.')[0])
+
+def get_latest_version(chrome_version, url):
     '''查询最新的Chromedriver版本'''
     rep = requests.get(url).text
     time_list = []                                          # 用来存放版本时间
@@ -44,18 +49,14 @@ def get_latest_version(url):
     result = re.compile(r'\d.*?/</a>.*?Z').findall(rep)     # 匹配文件夹（版本号）和时间
     for i in result:
         time = i[-24:-1]                                    # 提取时间
-        version = re.compile(r'.*?/').findall(i)[0]         # 提取版本号
-        time_version_dict[time] = version                   # 构建时间和版本号的对应关系，形成字典
-        time_list.append(time)                              # 形成时间列表
-    
-    mmax = time_list[0]
-    nmax = time_list[0]
-    for it in time_list:
-        if(it > mmax):
-            nmax = mmax
-            mmax = it
-    latest_version = time_version_dict[nmax][:-1] # 用最大（新）时间去字典中获取最新的版本号
+        version = re.compile(r''+str(chrome_version)+'.+?/').findall(i)        # 提取版本号
+        # print(i)
+        if(len(version) > 1):
+            time_version_dict[time] = version[-1]                   # 构建时间和版本号的对应关系，形成字典
+            time_list.append(time)                              # 形成时间列表
+    latest_version = time_version_dict[max(time_list)][:-1] # 用最大（新）时间去字典中获取最新的版本号
     return latest_version
+
 
 def download_driver(download_url):
     '''下载文件'''
@@ -431,7 +432,9 @@ if __name__ == "__main__":
 
         while True:
             url = 'http://npm.taobao.org/mirrors/chromedriver/'
-            latest_version = get_latest_version(url)
+            chrome_version = get_chrome_version()
+            print('当前系统安装的chrome版本为：', chrome_version)
+            latest_version = get_latest_version(chrome_version, url)    
             print('最新的chromedriver版本为：', latest_version)
             version = get_version()
             print('当前系统内的Chromedriver版本为：', version)
