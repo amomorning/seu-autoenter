@@ -178,44 +178,37 @@ def click_enter_date(rid, tomorrow, hh, mm, browser):
 
     # click 
     js = reqid + ".click();"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set year
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1920) + "].click()"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set month
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[1].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.month-1) + "].click()"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
 
     # set day
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[2].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.day-1) + "].click()"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set hour
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[3].getElementsByClassName('mt-picker-column-item')[" + str(hh) + "].click()"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # set minite
     js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[4].getElementsByClassName('mt-picker-column-item')[" + str(mm) + "].click();"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click()"
-    # print(js)
     browser.execute_script(js)
     time.sleep(1)
 
@@ -235,23 +228,7 @@ def click_select_way(browser):
     browser.execute_script(js)
     time.sleep(1)
 
-# TODO 校外同学申请入校需上传苏康码
-# 没有找到上传图片的标签
-# def upload_health_code(browser):
-#     reqid = "document.getElementsByClassName('is-require')[16]"
-#     # click
-#     js = reqid + ".click();"
-    # print(js)
-#     browser.execute_script(js)
-#     time.sleep(1)
 
-#     # click checkbox
-#     js = reqid + ".parentElement.getElementsByTagName('input')[1].click();"
-#     # print(js)
-#     browser.execute_script(js)
-#     time.sleep(1)
-
-                
 def input_field(placehold, text, browser):
     inputfileds = browser.find_elements_by_tag_name('input')
     for i in inputfileds:
@@ -434,20 +411,24 @@ if __name__ == "__main__":
             url = 'http://npm.taobao.org/mirrors/chromedriver/'
             chrome_version = get_chrome_version()
             print('当前系统安装的chrome版本为：', chrome_version)
-            latest_version = get_latest_version(chrome_version, url)    
-            print('最新的chromedriver版本为：', latest_version)
-            version = get_version()
-            print('当前系统内的Chromedriver版本为：', version)
-            if version == latest_version:
-                print('当前系统内的Chromedriver已经是最新的')
-            else:
-                print('当前系统内的Chromedriver不是最新的，需要进行更新')
-                download_url = url + latest_version + '/chromedriver_win32.zip'  # 拼接下载链接
-                download_driver(download_url)
-                path = get_path()
-                print('替换路径为：', path)
-                unzip_driver(path)
-                print('更新后的Chromedriver版本为：', get_version())        
+            try:
+                latest_version = get_latest_version(chrome_version, url)    
+                print('最新的chromedriver版本为：', latest_version)
+                version = get_version()
+                print('当前系统内的Chromedriver版本为：', version)
+                if version == latest_version:
+                    print('当前系统内的Chromedriver已经是最新的')
+                else:
+                    print('当前系统内的Chromedriver不是最新的，需要进行更新')
+                    download_url = url + latest_version + '/chromedriver_win31.zip'  # 拼接下载链接
+                    download_driver(download_url)
+                    path = get_path()
+                    print('替换路径为：', path)
+                    unzip_driver(path)
+                    print('更新后的Chromedriver版本为：', get_version())        
+
+            except:
+                print('Update Chromedriver error.')
 
             while(True):
                 if(auto_login(user, pw, tel, address)):
