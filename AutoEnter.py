@@ -60,6 +60,7 @@ def get_latest_version(chrome_version, url):
 
 def download_driver(download_url):
     '''下载文件'''
+    print(download_url)
     file = requests.get(download_url)
     with open("chromedriver.zip", 'wb') as zip_file:        # 保存文件到脚本所在目录
         zip_file.write(file.content)
@@ -78,6 +79,8 @@ def get_path():
 def unzip_driver(path):
     '''解压Chromedriver压缩包到指定目录'''
     f = zipfile.ZipFile("chromedriver.zip",'r')
+
+
     for file in f.namelist():
         f.extract(file, path)
 
@@ -420,7 +423,7 @@ if __name__ == "__main__":
                     print('当前系统内的Chromedriver已经是最新的')
                 else:
                     print('当前系统内的Chromedriver不是最新的，需要进行更新')
-                    download_url = url + latest_version + '/chromedriver_win31.zip'  # 拼接下载链接
+                    download_url = url + latest_version + '/chromedriver_win32.zip'  # 拼接下载链接
                     download_driver(download_url)
                     path = get_path()
                     print('替换路径为：', path)
