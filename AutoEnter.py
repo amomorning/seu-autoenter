@@ -185,7 +185,7 @@ def click_enter_date(rid, tomorrow, hh, mm, browser):
     time.sleep(1)
 
     # set year
-    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1920) + "].click()"
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1921) + "].click()"
     browser.execute_script(js)
     time.sleep(1)
 
@@ -305,7 +305,7 @@ def apply_enter(user, pw, tel, address):
         browser.implicitly_wait(1)
         time.sleep(10)
 
-        click_select(2, 0, browser)
+        # click_select(2, 0, browser)
 
         for i in range(5, 9):
             click_select(i, 0, browser)
