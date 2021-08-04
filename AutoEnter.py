@@ -24,10 +24,11 @@ chrome_options.add_argument('--incognito')#无痕隐身模式
 chrome_options.add_argument("disable-cache")#禁用缓存
 chrome_options.add_argument('log-level=3')
 chrome_options.add_argument('disable-infobars')
-chrome_options.add_argument('--headless')
 
 dailyDone = False # 今日是否已经打卡
 enterFlag = False # 是否需要申请入校
+
+sucodeURL = ''
 
 # 下载最新版本 chromedriver
 # https://blog.csdn.net/weijiaxin2010/article/details/86651042
@@ -103,6 +104,12 @@ def readConfig():
 
         global enterFlag
         enterFlag = enter_dict["enter"]
+        global sucodeURL
+        sucodeURL = enter_dict["sucodeURL"]
+
+        headless = enter_dict["headless"]
+        if(headless):
+            chrome_options.add_argument('--headless')
     
     # print(enter_dict)
 
@@ -139,19 +146,19 @@ def click_select(rid, pos, browser):
     js = reqid + ".click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(2)
 
     # select pos
     js = reqid + ".parentElement.getElementsByClassName('mt-picker-column-item')[" + str(pos) + "].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(2)
 
     # confirm
     js = reqid + ".parentElement.getElementsByClassName('mint-picker__confirm')[0].click();"
     # print(js)
     browser.execute_script(js)
-    time.sleep(1)
+    time.sleep(2)
     # print('finish select')
 
 
@@ -185,7 +192,7 @@ def click_enter_date(rid, tomorrow, hh, mm, browser):
     time.sleep(1)
 
     # set year
-    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[" + str(tomorrow.year-1921) + "].click()"
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[80].click()"
     browser.execute_script(js)
     time.sleep(1)
 
@@ -395,6 +402,45 @@ def auto_login(user, pw, tel, address):
         print("未知错误 %s" %(r))
 
     return False
+
+
+def auto_sucode():
+    if(sucodeURL == ''):
+        print("WARNING: 没有苏康码链接，请检查配置文件中sucodeURL项")
+        return False
+
+    try:
+        browser = webdriver.Chrome('./chromedriver',options=chrome_options)
+        print("------------------浏览器已启动----------------------")
+        browser.set_window_size(500,900)
+        browser.get(url)
+
+        flag = False
+        for i in range(5):
+            time.sleep(3)
+            el = browser.find_element_by_id('code-name')
+            if(el.text != ''):
+                flag = True
+                break
+
+        if(flag):
+            filename = './imgs/{}.png'.format(date.today())
+            browser.get_screenshot_as_file(filename)
+            browser.quit()
+            print("------------------浏览器已关闭----------------------")
+            return True
+        else:
+            print("WARNING: 无法保存苏康码")
+            print("------------------打卡出现故障----------------------")
+            print("------------------浏览器已关闭----------------------")
+            browser.quit()
+            return False
+    except Exception as r:
+        print("未知错误 %s" %(r))
+    return False
+
+
+
 
 
 if __name__ == "__main__":

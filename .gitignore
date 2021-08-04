@@ -137,3 +137,4 @@ _*
 log.txt
 *.exe
 *.zip
+/imgs
