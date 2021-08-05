@@ -12,7 +12,8 @@ import time
 import random
 import json
 import codecs
-
+import base64
+import pyperclip
 
 # 加启动配置 禁用日志log
 chrome_options = Options()
@@ -192,7 +193,7 @@ def click_enter_date(rid, tomorrow, hh, mm, browser):
     time.sleep(1)
 
     # set year
-    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[80].click()"
+    js = reqid + ".parentElement.getElementsByClassName('mint-picker-column')[0].getElementsByClassName('mt-picker-column-item')[100].click()"
     browser.execute_script(js)
     time.sleep(1)
 
@@ -314,19 +315,19 @@ def apply_enter(user, pw, tel, address):
 
         # click_select(2, 0, browser)
 
-        for i in range(5, 9):
-            click_select(i, 0, browser)
+        # for i in range(5, 7):
+        #     click_select(i, 0, browser)
         
         click_select_way(browser)
 
-        click_checkbox(10, browser)
+        # click_checkbox(14, browser)
 
         tomorrow = (date.today() + timedelta(1))
 
-        click_enter_date(11, tomorrow, 8, 31, browser)
-        click_enter_date(12, tomorrow, 21, 59, browser)
+        click_enter_date(15, tomorrow, 7, 31, browser)
+        click_enter_date(16, tomorrow, 21, 59, browser)
 
-        click_select(15, 2, browser)
+        click_select(19, 2, browser)
 
         input_field("请输入所到楼宇（具体到门牌号）", address, browser)
         browser.implicitly_wait(1)
@@ -336,7 +337,21 @@ def apply_enter(user, pw, tel, address):
             input_field("请输入联系方式", tel, browser)
             browser.implicitly_wait(1)
             time.sleep(1)
+        
+
+        filename = './imgs/{}.png'.format(date.today())
+        with open(filename, "rb") as f:
+            b = 'data:image/png;base64,' + str(base64.b64encode(f.read()))[2:-1]
             
+            js = "document.getElementsByClassName('upload_img')[2].src='{}'".format(b)
+            pyperclip.copy(js)
+
+            browser.execute_script(js)
+
+            time.sleep(10)
+
+
+        time.sleep(60)
         # 确认并提交
         if(click_confirm("提交", "申请成功", browser)) : 
             browser.quit()
@@ -371,6 +386,7 @@ def auto_login(user, pw, tel, address):
         # print(dailyDone)
         if(dailyDone):
             print("今日已打卡")
+            browser.quit()
             return True
 
         if dailyDone is False: # 今日未完成打卡
@@ -413,7 +429,7 @@ def auto_sucode():
         browser = webdriver.Chrome('./chromedriver',options=chrome_options)
         print("------------------浏览器已启动----------------------")
         browser.set_window_size(500,900)
-        browser.get(url)
+        browser.get(sucodeURL)
 
         flag = False
         for i in range(5):
@@ -457,32 +473,35 @@ if __name__ == "__main__":
             set_hour = 7 # 如果首次登录超过上午10点，则以后默认在7点钟打卡
 
         while True:
-            url = 'http://npm.taobao.org/mirrors/chromedriver/'
-            chrome_version = get_chrome_version()
-            print('当前系统安装的chrome版本为：', chrome_version)
-            try:
-                latest_version = get_latest_version(chrome_version, url)    
-                print('最新的chromedriver版本为：', latest_version)
-                version = get_version()
-                print('当前系统内的Chromedriver版本为：', version)
-                if version == latest_version:
-                    print('当前系统内的Chromedriver已经是最新的')
-                else:
-                    print('当前系统内的Chromedriver不是最新的，需要进行更新')
-                    download_url = url + latest_version + '/chromedriver_win32.zip'  # 拼接下载链接
-                    download_driver(download_url)
-                    path = get_path()
-                    print('替换路径为：', path)
-                    unzip_driver(path)
-                    print('更新后的Chromedriver版本为：', get_version())        
+            # url = 'http://npm.taobao.org/mirrors/chromedriver/'
+            # chrome_version = get_chrome_version()
+            # print('当前系统安装的chrome版本为：', chrome_version)
+            # try:
+            #     latest_version = get_latest_version(chrome_version, url)    
+            #     print('最新的chromedriver版本为：', latest_version)
+            #     version = get_version()
+            #     print('当前系统内的Chromedriver版本为：', version)
+            #     if version == latest_version:
+            #         print('当前系统内的Chromedriver已经是最新的')
+            #     else:
+            #         print('当前系统内的Chromedriver不是最新的，需要进行更新')
+            #         download_url = url + latest_version + '/chromedriver_win32.zip'  # 拼接下载链接
+            #         download_driver(download_url)
+            #         path = get_path()
+            #         print('替换路径为：', path)
+            #         unzip_driver(path)
+            #         print('更新后的Chromedriver版本为：', get_version())        
 
-            except:
-                print('Update Chromedriver error.')
+            # except:
+            #     print('Update Chromedriver error.')
 
-            while(True):
-                if(auto_login(user, pw, tel, address)):
-                    break
+            # while(True):
+            #     if(auto_login(user, pw, tel, address)):
+            #         break
 
+            # while(True):
+            #     if(auto_sucode()):
+            #         break
 
             while enterFlag:
                 if(apply_enter(user, pw, tel, address)):
