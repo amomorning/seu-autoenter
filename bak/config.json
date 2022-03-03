@@ -3,5 +3,6 @@
     "password" : "123qweza",
     "enter" : false,
     "address" : "前工院南602",
-    "tel" : ""
+    "tel" : "",
+    "headless": false
 }

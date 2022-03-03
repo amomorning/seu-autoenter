@@ -34,7 +34,7 @@ browser.get(url)
 flag = False
 for i in range(5):
     time.sleep(3)
-    el = browser.find_element_by_id('code-name')
+    el = browser.find_element(By.ID, 'code-name')
     if(el.text != ''):
         flag = True
         break
